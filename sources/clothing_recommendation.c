@@ -1,78 +1,63 @@
 #include <stdio.h>
+#include <stdbool.h>
 #include <string.h>
 
-
-// 고민해봤는데 너무 어려워서 계절별 상의, 하의를 입력받고 그 중에서 기온에 따라 옷을 추천해주는 방식으로 프로그램을 짜는걸 고려해봐야겠음
-//예를 들어 아래 처럼 4가지 계절하고 기온에 따라 범위를 쥐어주고 그 옷들 중에서 추천해주는 식이 낫지 않을까 싶다
-//여름 상의를 배열로 입력받는다
-//여름 하의를 배열로 입력받는다
-
-// 입었던 옷을 어떻게 제외할지도 고민이다. 특정 키워드가 들어가면 제외하도록 할수 있나
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+#define MAX_CLOTHES 5 // 각 계절별 최대 옷 수
+#define MAX_KEYWORD_LEN 20 // 특정 키워드 최대 길이
 
 struct ClothingItem {
-    char top[20];
-    char bottom[20];
-    char shoes[20];
+    char* top[MAX_CLOTHES];
+    char* bottom[MAX_CLOTHES];
 };
 
-struct WornOutfit {
-    char top[20];
-    char bottom[20];
-    char shoes[20];
-};
+void recommendClothes(int temperature, struct ClothingItem clothes);
 
 int main() {
-    struct ClothingItem wardrobe[10]; // 최대 10개의 옷 아이템을 저장할 수 있는 배열
-    int clothesCount = 0; // 현재 옷장에 저장된 옷 아이템 수
+    struct ClothingItem spring, summer, autumn, winter;
 
-    while (clothesCount < 10) {
-        printf("상의를 입력하세요: ");
-        scanf_s("%s", wardrobe[clothesCount].top, sizeof(wardrobe[clothesCount].top));
-        printf("하의를 입력하세요: ");
-        scanf_s("%s", wardrobe[clothesCount].bottom, sizeof(wardrobe[clothesCount].bottom));
-        printf("신발을 입력하세요: ");
-        scanf_s("%s", wardrobe[clothesCount].shoes, sizeof(wardrobe[clothesCount].shoes));
-        clothesCount++;
-
-        char choice;
-        printf("더 입력하시겠습니까? 최대 10세트까지 입력할 수 있습니다. (y/n): ");
-        scanf_s(" %c", &choice);
-
-        if (choice != 'y' && choice != 'Y') { // 대소문자 구별하지 않으려는 조건문
-            break;
-        }
+    // 봄 옷 입력
+    printf("봄 상의를 입력하세요 (최대 %d개): \n", MAX_CLOTHES);
+    for (int i = 0; i < MAX_CLOTHES; i++) {
+        char tempTop[MAX_KEYWORD_LEN];
+        scanf_s("%s", tempTop);
+        spring.top[i] = strdup(tempTop);
     }
 
-    // 사용자가 최소 3일 전에 이미 입은 옷 저장
-    struct WornOutfit wornOutfits[3];
-
-    for (int i = 0; i < 3; i++) {
-        printf("최소 3일 전에 이미 입은 옷 정보를 입력하세요 \n");
-        printf("상의를 입력하세요: ");
-        scanf_s("%s", wornOutfits[i].top, sizeof(wornOutfits[i].top));
-        printf("하의를 입력하세요: ");
-        scanf_s("%s", wornOutfits[i].bottom, sizeof(wornOutfits[i].bottom));
-        printf("신발을 입력하세요: ");
-        scanf_s("%s", wornOutfits[i].shoes, sizeof(wornOutfits[i].shoes));
+    printf("봄 하의를 입력하세요 (최대 %d개): \n", MAX_CLOTHES);
+    for (int i = 0; i < MAX_CLOTHES; i++) {
+        char tempBottom[MAX_KEYWORD_LEN];
+        scanf_s("%s", tempBottom);
+        spring.bottom[i] = strdup(tempBottom);
     }
 
-    printf("이미 입은 옷 정보를 출력합니다:\n");
-    for (int i = 0; i < 3; i++) {
-        printf("상의: %s, 하의: %s, 신발: %s\n", wornOutfits[i].top, wornOutfits[i].bottom, wornOutfits[i].shoes);
-    }
+    // 여름, 가을, 겨울 옷 입력 (위와 동일하게)
+
+    int currentTemperature;
+    printf("현재 기온을 입력하세요: ");
+    scanf_s("%d", &currentTemperature);
+
+    // 각 계절별로 추천해주는 함수 호출
+    recommendClothes(currentTemperature, spring);
+    // 여름, 가을, 겨울에 대해서도 위 함수를 호출
+
     return 0;
 }
+
+void recommendClothes(int temperature, struct ClothingItem clothes) {
+    printf("현재 기온은 %d도 입니다.\n", temperature);
+
+    printf("추천하는 옷은 다음과 같습니다:\n");
+    if (temperature >= 25) {
+        // 더운 날씨에 맞는 옷 추천
+        printf("상의: %s, 하의: %s\n", clothes.top[0], clothes.bottom[0]);
+    }
+    else if (temperature >= 15) {
+        // 시원한 날씨에 맞는 옷 추천
+        printf("상의: %s, 하의: %s\n", clothes.top[1], clothes.bottom[1]);
+    }
+    else {
+        // 쌀쌀한 날씨에 맞는 옷 추천
+        printf("상의: %s, 하의: %s\n", clothes.top[2], clothes.bottom[2]);
+    }
+}
+

@@ -1,63 +1,129 @@
 #include <stdio.h>
-#include <stdbool.h>
+#include <stdlib.h>
+#include <time.h>
 #include <string.h>
 
-#define MAX_CLOTHES 5 // 각 계절별 최대 옷 수
-#define MAX_KEYWORD_LEN 20 // 특정 키워드 최대 길이
+#define MAX_CLOTHES 10
+#define MAX_LENGTH 50
 
-struct ClothingItem {
-    char* top[MAX_CLOTHES];
-    char* bottom[MAX_CLOTHES];
-};
+// 기온에 따라 계절을 판단하는 함수
+char* determineSeason(int temperature) {
+    char* season;
 
-void recommendClothes(int temperature, struct ClothingItem clothes);
+    if (temperature >= 25) {
+        season = "여름";
+    }
+    else if (temperature >= 15) {
+        season = "봄 또는 가을";
+    }
+    else if (temperature >= 0) {
+        season = "겨울";
+    }
+    else {
+        season = "잘못된 온도";
+    }
+
+    return season;
+}
+
+// 각 계절의 옷을 입력하는 함수
+void getClothes(char clothes[MAX_CLOTHES][MAX_LENGTH], const char* season, int* numClothes) {
+    printf("%s 옷을 입력해주세요 (최대 %d가지):\n", season, MAX_CLOTHES);
+    while (*numClothes < MAX_CLOTHES) {
+        printf("옷 %d: ", *numClothes + 1);
+        scanf_s("%s", clothes[*numClothes], MAX_LENGTH);
+
+        printf("더 입력하시겠습니까? (y/n): ");
+        char choice;
+        scanf_s(" %c", &choice, sizeof(choice));
+
+        if (choice == 'n' || choice == 'N') {
+            break;
+        }
+
+        (*numClothes)++;
+    }
+}
+
+// 각 계절의 옷 목록을 출력하는 함수
+void printAllClothes(const char clothes[MAX_CLOTHES][MAX_LENGTH], const char* season, int numClothes) {
+    printf("\n%s 옷 목록:\n", season);
+    for (int i = 0; i < numClothes; ++i) {
+        printf("%d. %s\n", i + 1, clothes[i]);
+    }
+}
+
+// 모든 계절의 옷 리스트를 출력하는 함수
+void printTotalClothes(const char springClothes[MAX_CLOTHES][MAX_LENGTH], int numSpringClothes,
+    const char summerClothes[MAX_CLOTHES][MAX_LENGTH], int numSummerClothes,
+    const char fallClothes[MAX_CLOTHES][MAX_LENGTH], int numFallClothes,
+    const char winterClothes[MAX_CLOTHES][MAX_LENGTH], int numWinterClothes) {
+    printf("\n가진 옷 리스트:\n");
+    printf("봄 옷:\n");
+    printAllClothes(springClothes, "봄", numSpringClothes);
+    printf("\n여름 옷:\n");
+    printAllClothes(summerClothes, "여름", numSummerClothes);
+    printf("\n가을 옷:\n");
+    printAllClothes(fallClothes, "가을", numFallClothes);
+    printf("\n겨울 옷:\n");
+    printAllClothes(winterClothes, "겨울", numWinterClothes);
+}
+
+// 해당 계절에 어울리는 옷을 랜덤으로 추천하는 함수
+void recommendClothes(const char clothes[MAX_CLOTHES][MAX_LENGTH], int numClothes, const char* season) {
+    int suitableClothes[MAX_CLOTHES];
+    int numSuitable = 0;
+
+    // 해당 계절에 어울리는 옷의 인덱스를 찾아 배열에 저장
+    for (int i = 0; i < numClothes; ++i) {
+        if (strstr(clothes[i], season) != NULL) {
+            suitableClothes[numSuitable++] = i;
+        }
+    }
+
+    // 해당 계절에 어울리는 옷이 없는 경우
+    if (numSuitable == 0) {
+        printf("해당 계절에 어울리는 옷이 없습니다.\n");
+    }
+    else { // 해당 계절에 어울리는 옷 중에서 랜덤으로 추천
+        srand(time(NULL));
+        int randomIndex = suitableClothes[rand() % numSuitable];
+        printf("추천하는 %s 옷: %s\n", season, clothes[randomIndex]);
+    }
+}
 
 int main() {
-    struct ClothingItem spring, summer, autumn, winter;
+    char springClothes[MAX_CLOTHES][MAX_LENGTH];
+    char summerClothes[MAX_CLOTHES][MAX_LENGTH];
+    char fallClothes[MAX_CLOTHES][MAX_LENGTH];
+    char winterClothes[MAX_CLOTHES][MAX_LENGTH];
 
-    // 봄 옷 입력
-    printf("봄 상의를 입력하세요 (최대 %d개): \n", MAX_CLOTHES);
-    for (int i = 0; i < MAX_CLOTHES; i++) {
-        char tempTop[MAX_KEYWORD_LEN];
-        scanf_s("%s", tempTop);
-        spring.top[i] = strdup(tempTop);
+    int numSpringClothes = 0, numSummerClothes = 0, numFallClothes = 0, numWinterClothes = 0;
+
+    // 각 계절의 옷 입력 받기
+    getClothes(springClothes, "봄", &numSpringClothes);
+    getClothes(summerClothes, "여름", &numSummerClothes);
+    getClothes(fallClothes, "가을", &numFallClothes);
+    getClothes(winterClothes, "겨울", &numWinterClothes);
+
+    // 전체 옷 리스트 출력
+    printTotalClothes(springClothes, numSpringClothes, summerClothes, numSummerClothes,
+        fallClothes, numFallClothes, winterClothes, numWinterClothes);
+
+    int temperature;
+    printf("\n기온을 입력하세요: ");
+    scanf_s("%d", &temperature);
+
+    char* result = determineSeason(temperature);
+    printf("현재 계절은 %s입니다.\n", result);
+
+    // 해당 계절에 맞는 옷 추천
+    if (strcmp(result, "여름") == 0 || strcmp(result, "겨울") == 0 || strcmp(result, "봄 또는 가을") == 0) {
+        recommendClothes(summerClothes, numSummerClothes, result);
     }
-
-    printf("봄 하의를 입력하세요 (최대 %d개): \n", MAX_CLOTHES);
-    for (int i = 0; i < MAX_CLOTHES; i++) {
-        char tempBottom[MAX_KEYWORD_LEN];
-        scanf_s("%s", tempBottom);
-        spring.bottom[i] = strdup(tempBottom);
+    else {
+        printf("해당 계절에 대한 추천 옷은 없습니다.\n");
     }
-
-    // 여름, 가을, 겨울 옷 입력 (위와 동일하게)
-
-    int currentTemperature;
-    printf("현재 기온을 입력하세요: ");
-    scanf_s("%d", &currentTemperature);
-
-    // 각 계절별로 추천해주는 함수 호출
-    recommendClothes(currentTemperature, spring);
-    // 여름, 가을, 겨울에 대해서도 위 함수를 호출
 
     return 0;
 }
-
-void recommendClothes(int temperature, struct ClothingItem clothes) {
-    printf("현재 기온은 %d도 입니다.\n", temperature);
-
-    printf("추천하는 옷은 다음과 같습니다:\n");
-    if (temperature >= 25) {
-        // 더운 날씨에 맞는 옷 추천
-        printf("상의: %s, 하의: %s\n", clothes.top[0], clothes.bottom[0]);
-    }
-    else if (temperature >= 15) {
-        // 시원한 날씨에 맞는 옷 추천
-        printf("상의: %s, 하의: %s\n", clothes.top[1], clothes.bottom[1]);
-    }
-    else {
-        // 쌀쌀한 날씨에 맞는 옷 추천
-        printf("상의: %s, 하의: %s\n", clothes.top[2], clothes.bottom[2]);
-    }
-}
-

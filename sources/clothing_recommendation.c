@@ -6,24 +6,20 @@
 #define MAX_CLOTHES 10
 #define MAX_LENGTH 50
 
-// 기온에 따라 계절을 판단하는 함수
-char* determineSeason(int temperature) {
-    char* season;
-
-    if (temperature >= 25) {
-        season = "여름";
-    }
-    else if (temperature >= 15) {
-        season = "봄 또는 가을";
-    }
-    else if (temperature >= 0) {
-        season = "겨울";
-    }
-    else {
-        season = "잘못된 온도";
+void recommendOutfit(const char clothes[MAX_CLOTHES][MAX_LENGTH], int numClothes, const char* season) {
+    // 옷이 없는 경우 해당 계절에 대한 추천이 불가능함을 알림
+    if (numClothes == 0) {
+        printf("추천할 수 없습니다. %s에 대한 옷이 없습니다.\n", season);
+        return;
     }
 
-    return season;
+    // 시간을 기반으로 난수 생성을 위한 초기화
+    srand(time(NULL));
+
+    // 해당 계절의 옷 목록에서 랜덤한 인덱스를 생성하여 추천
+    int randomIndex = rand() % numClothes;
+
+    printf("\n현재 날씨에 따른 옷을 추천합니다: %s - %s\n", season, clothes[randomIndex]);
 }
 
 // 각 계절의 옷을 입력하는 함수
@@ -69,28 +65,7 @@ void printTotalClothes(const char springClothes[MAX_CLOTHES][MAX_LENGTH], int nu
     printAllClothes(winterClothes, "겨울", numWinterClothes);
 }
 
-// 해당 계절에 어울리는 옷을 랜덤으로 추천하는 함수
-void recommendClothes(const char clothes[MAX_CLOTHES][MAX_LENGTH], int numClothes, const char* season) {
-    int suitableClothes[MAX_CLOTHES];
-    int numSuitable = 0;
 
-    // 해당 계절에 어울리는 옷의 인덱스를 찾아 배열에 저장
-    for (int i = 0; i < numClothes; ++i) {
-        if (strstr(clothes[i], season) != NULL) {
-            suitableClothes[numSuitable++] = i;
-        }
-    }
-
-    // 해당 계절에 어울리는 옷이 없는 경우
-    if (numSuitable == 0) {
-        printf("해당 계절에 어울리는 옷이 없습니다.\n");
-    }
-    else { // 해당 계절에 어울리는 옷 중에서 랜덤으로 추천
-        srand(time(NULL));
-        int randomIndex = suitableClothes[rand() % numSuitable];
-        printf("추천하는 %s 옷: %s\n", season, clothes[randomIndex]);
-    }
-}
 
 int main() {
     char springClothes[MAX_CLOTHES][MAX_LENGTH];
@@ -110,19 +85,28 @@ int main() {
     printTotalClothes(springClothes, numSpringClothes, summerClothes, numSummerClothes,
         fallClothes, numFallClothes, winterClothes, numWinterClothes);
 
+
     int temperature;
-    printf("\n기온을 입력하세요: ");
+    printf("현재 기온을 입력해 주세요: ");
     scanf_s("%d", &temperature);
 
-    char* result = determineSeason(temperature);
-    printf("현재 계절은 %s입니다.\n", result);
-
-    // 해당 계절에 맞는 옷 추천
-    if (strcmp(result, "여름") == 0 || strcmp(result, "겨울") == 0 || strcmp(result, "봄 또는 가을") == 0) {
-        recommendClothes(summerClothes, numSummerClothes, result);
+    const char* season;
+    // 기온에 따라 계절 판별
+    if (temperature >= 25) {
+        season = "여름";
+        recommendOutfit(summerClothes, numSummerClothes, season);
+    }
+    else if (temperature >= 15 && temperature < 25) {
+        season = "봄";
+        recommendOutfit(springClothes, numSpringClothes, season);
+    }
+    else if (temperature >= 5 && temperature < 15) {
+        season = "가을";
+        recommendOutfit(fallClothes, numFallClothes, season);
     }
     else {
-        printf("해당 계절에 대한 추천 옷은 없습니다.\n");
+        season = "겨울";
+        recommendOutfit(winterClothes, numWinterClothes, season);
     }
 
     return 0;

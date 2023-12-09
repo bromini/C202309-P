@@ -20,4 +20,5 @@ int main() {
     free(winterClothes);
 
     return 0;
+
 }

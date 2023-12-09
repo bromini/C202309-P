@@ -33,6 +33,7 @@ void printClothesForSeason(const Clothes* clothes, const char* season, int numCl
     for (int i = 0; i < numClothes; ++i) {
         printf("%d. %s\n", i + 1, clothes[i].name);
     }
+
 }
 
 void recommendOutfit(const Clothes* clothes, int numClothes, const char* season) {
@@ -45,25 +46,58 @@ void recommendOutfit(const Clothes* clothes, int numClothes, const char* season)
     int randomIndex = rand() % numClothes;
 
     printf("\n현재 날씨에 따른 옷차림(룩)을 추천합니다: %s - %s\n", season, clothes[randomIndex].name);
+    const char* fileName = "recommended_outfit.txt";
+
+    FILE* file;
+    errno_t err = fopen_s(&file, fileName, "a"); // 파일 열기 시도
+
+    if (err != 0) {
+        printf("파일을 열 수 없습니다.\n");
+        return;
+    }
+
+    // 결과를 파일에 쓰기
+    fprintf(file, "\n현재 날씨에 따른 옷차림(룩)을 추천합니다: %s - %s\n", season, clothes[randomIndex].name);
+
+    // 파일 닫기
+    fclose(file);
 }
 
 void recommendAdditionalClothes(int numSpringClothes, int numSummerClothes,
     int numFallClothes, int numWinterClothes) {
     printf("\n추가적인 옷을 구매하시길 권장하는 계절:\n");
 
+    // 파일 이름 설정
+    const char* fileName = "recommended_clothes.txt";
+
+    FILE* file;
+    errno_t err = fopen_s(&file, fileName, "a"); // 파일 열기 시도
+
+    if (err != 0) {
+        printf("파일을 열 수 없습니다.\n");
+        return;
+    }
+
     if (numSpringClothes < MAX_CLOTHES) {
         printf("- 봄 옷을 %d개 더 구매하십시오.\n", MAX_CLOTHES - numSpringClothes);
+        fprintf(file, "- 봄 옷을 %d개 더 구매하십시오.\n", MAX_CLOTHES - numSpringClothes);
     }
     if (numSummerClothes < MAX_CLOTHES) {
         printf("- 여름 옷을 %d개 더 구매하십시오.\n", MAX_CLOTHES - numSummerClothes);
+        fprintf(file, "- 여름 옷을 %d개 더 구매하십시오.\n", MAX_CLOTHES - numSummerClothes);
     }
     if (numFallClothes < MAX_CLOTHES) {
         printf("- 가을 옷을 %d개 더 구매하십시오.\n", MAX_CLOTHES - numFallClothes);
+        fprintf(file, "- 가을 옷을 %d개 더 구매하십시오.\n", MAX_CLOTHES - numFallClothes);
     }
     if (numWinterClothes < MAX_CLOTHES) {
         printf("- 겨울 옷을 %d개 더 구매하십시오.\n", MAX_CLOTHES - numWinterClothes);
+        fprintf(file, "- 겨울 옷을 %d개 더 구매하십시오.\n", MAX_CLOTHES - numWinterClothes);
     }
+
+    fclose(file); // 파일 닫기
 }
+
 
 void determineSeason(const Clothes* springClothes, int numSpringClothes,
     const Clothes* summerClothes, int numSummerClothes,

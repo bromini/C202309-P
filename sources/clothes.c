@@ -3,10 +3,12 @@
 #include <stdlib.h>
 #include <time.h>
 
+// 사용자로부터 옷 정보를 입력받는 함수
 void getClothes(Clothes** clothes, const char* season, int* numClothes) {
     printf("%s 옷차림(룩)을 입력해주세요: (최대 %d가지,띄어쓰기 사용 X)\n예시) 검정맨투맨슬랙스단화\n", season, MAX_CLOTHES);
 
-    *clothes = (Clothes*)malloc(MAX_CLOTHES * sizeof(Clothes));
+    *clothes = (Clothes*)malloc(MAX_CLOTHES * sizeof(Clothes)); // 메모리 할당
+
     if (*clothes == NULL) {
         printf("메모리 할당 오류\n");
         exit(1);
@@ -14,9 +16,9 @@ void getClothes(Clothes** clothes, const char* season, int* numClothes) {
 
     while (*numClothes < MAX_CLOTHES) {
         printf("옷차림(룩) %d: ", *numClothes + 1);
-        scanf_s("%s", (*clothes)[*numClothes].name, MAX_LENGTH);
+        scanf_s("%s", (*clothes)[*numClothes].name, MAX_LENGTH); // 옷 정보 입력
 
-        (*numClothes)++;
+        (*numClothes)++; // 옷 개수 증가
 
         printf("더 입력하시겠습니까? (종료시: n or N/더 입력하려면 아무키나 누르시오): ");
         char choice;
@@ -28,24 +30,21 @@ void getClothes(Clothes** clothes, const char* season, int* numClothes) {
     }
 }
 
+// 해당 계절의 옷 리스트를 출력하는 함수
 void printClothesForSeason(const Clothes* clothes, const char* season, int numClothes) {
     printf("\n%s 옷차림(룩) 목록:\n", season);
     for (int i = 0; i < numClothes; ++i) {
         printf("%d. %s\n", i + 1, clothes[i].name);
     }
-
 }
 
+// 현재 날씨에 따라 옷을 추천하는 함수
 void recommendOutfit(const Clothes* clothes, int numClothes, const char* season) {
-    if (numClothes == 0) {
-        printf("추천할 수 없습니다. %s에 대한 옷차림(룩)이 없습니다.\n", season);
-        return;
-    }
-
     srand(time(NULL));
     int randomIndex = rand() % numClothes;
 
     printf("\n현재 날씨에 따른 옷차림(룩)을 추천합니다: %s - %s\n", season, clothes[randomIndex].name);
+    // 파일 이름 설정
     const char* fileName = "recommended_outfit.txt";
 
     FILE* file;
@@ -63,6 +62,7 @@ void recommendOutfit(const Clothes* clothes, int numClothes, const char* season)
     fclose(file);
 }
 
+// 추가적인 옷을 권장하는 함수
 void recommendAdditionalClothes(int numSpringClothes, int numSummerClothes,
     int numFallClothes, int numWinterClothes) {
     printf("\n추가적인 옷을 구매하시길 권장하는 계절:\n");
@@ -98,7 +98,7 @@ void recommendAdditionalClothes(int numSpringClothes, int numSummerClothes,
     fclose(file); // 파일 닫기
 }
 
-
+// 현재 계절을 판단하고 옷을 추천하는 함수
 void determineSeason(const Clothes* springClothes, int numSpringClothes,
     const Clothes* summerClothes, int numSummerClothes,
     const Clothes* fallClothes, int numFallClothes,
@@ -126,6 +126,7 @@ void determineSeason(const Clothes* springClothes, int numSpringClothes,
     }
 }
 
+// 전체 옷 리스트를 출력하고 부족한 옷을 추천하는 함수
 void printTotalClothes(const Clothes* springClothes, int numSpringClothes,
     const Clothes* summerClothes, int numSummerClothes,
     const Clothes* fallClothes, int numFallClothes,
